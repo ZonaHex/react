@@ -4,7 +4,7 @@ import QuestionCard  from './components/QuestionCard'
 //types
 import {Difficulty, fetchQuizQuestions, QuestionState} from "./API";
 
-type AnswerObject = {
+export type AnswerObject = {
     question: string;
     answer: string;
     correct: boolean;
@@ -42,9 +42,35 @@ const App = () => {
     };
 
     
-    const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {};
+    const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if(!gameOver) {
+            //users answer
+            const answer = e.currentTarget.value;
+            //check if answer is right
+            const correct = questions[number].correct_answer === answer;
+            //答对就加分
+            if(correct) setScore(prev => prev + 1);
+            //save answer in the array of user answers
+            const answerObject = {
+                question: questions[number].question,
+                answer,
+                correct,
+                correctAnswer: questions[number].correct_answer,
+            };
+            setUserAnswers(prev => [...prev, answerObject])
+        }
+    };
     
-    const nextQuestion = () => {};
+    const nextQuestion = () => {
+        //下一个问题的序号
+        const nextQuestion = number + 1;
+
+        if(nextQuestion === TOTAL_QUESTIONS) {
+            setGameOver(true);
+        } else {
+            setNumber(nextQuestion);
+        }
+    };
     
   return (
     <div className="App">
@@ -60,7 +86,7 @@ const App = () => {
 
         {!gameOver ?
             <p className="score">
-            Score:
+            Score: {score}
         </p>
             : null}
         {loading &&
@@ -86,6 +112,7 @@ const App = () => {
             Next Question
         </button>
             :null}
+        {/*下一个问题的条件*/}
 
     </div>
   );
